@@ -5,11 +5,16 @@ import {MessageType} from "../../common/dto/MessageResponse";
 import {toast} from "react-toastify";
 import {Button} from "@material-ui/core";
 import {EventList} from "./eventList/EventList";
+import SignIn from "../SignIn";
+import Login from "../institutionUser/login/Login";
+import {State} from "../institutionUser/login/Login"
+import {Redirect} from "react-router-dom";
 
 export function ExternalUserView() {
 
     const [isAddEventModelOpen, setAddEventModelOpen] = useState(false);
     const [eventQueryResponse, setEventQueryResponse] = useState<EventQueryResponse[]>([]);
+    const [isLoginModelOpen, setLoginModelOpen] = useState(false);
 
     const eventApi = new EventApi();
 
@@ -34,9 +39,11 @@ export function ExternalUserView() {
         }
     }
 
+
     return (
         <div>
             <Button color="primary" onClick={() => setAddEventModelOpen(true)}>Add event</Button>
+            <Button color="primary" onClick={<Redirect to='/login'  />}>Login as Institute</Button>
             <AddEvent isOpen={isAddEventModelOpen}
                       handleClose={() => setAddEventModelOpen(false)}
                       addEvent={addEvent}/>

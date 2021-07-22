@@ -76,5 +76,8 @@ public class Event extends BaseEntity {
         eventQuota--;
     }
 
+    public boolean quotaIsLessThanZero() {
+        return (eventQuota < 0);
+    }
 
 }
