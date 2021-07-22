@@ -8,7 +8,7 @@ import {EventList} from "./eventList/EventList";
 import SignIn from "../SignIn";
 import Login from "../institutionUser/login/Login";
 import {State} from "../institutionUser/login/Login"
-import {Redirect} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 
 export function ExternalUserView() {
 
@@ -43,7 +43,7 @@ export function ExternalUserView() {
     return (
         <div>
             <Button color="primary" onClick={() => setAddEventModelOpen(true)}>Add event</Button>
-            <Button color="primary" onClick={<Redirect to='/login'  />}>Login as Institute</Button>
+            <Button variant="contained" color="primary" href="login">Login as Institute User</Button>
             <AddEvent isOpen={isAddEventModelOpen}
                       handleClose={() => setAddEventModelOpen(false)}
                       addEvent={addEvent}/>
