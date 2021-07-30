@@ -7,6 +7,7 @@ import yte.intern.eventmanagement1.common.entity.BaseEntity;
 import yte.intern.eventmanagement1.common.enums.MessageType;
 import yte.intern.eventmanagement1.event.entity.Event;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
+import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -32,6 +33,10 @@ public class InstitutionUser extends BaseEntity {
     public InstitutionUser(final String username, final String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public void updateEvent(final AddEventToInstituteRequest toBeUpdatedEvent) {
+        myEvents.stream().map(BaseEntity::id).forEach(aLong -> if(aLong == toBeUpdatedEvent.getId())) );
     }
 
     public MessageResponse canAddEvent(final Event toBeAddedEvent) {

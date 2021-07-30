@@ -7,6 +7,7 @@ import yte.intern.eventmanagement1.event.controller.request.AddUserToEventReques
 import yte.intern.eventmanagement1.event.controller.response.EventQueryResponse;
 import yte.intern.eventmanagement1.event.service.EventService;
 import yte.intern.eventmanagement1.event.controller.request.AddEventRequest;
+import yte.intern.eventmanagement1.externalUser.controller.response.UserQueryResponse;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 @Validated
+@CrossOrigin(origins = "http://localhost:3000")
 public class EventController {
     private final EventService eventService;
 
@@ -35,9 +37,16 @@ public class EventController {
 
     // Names are unique for events
     /*@PathVariable String name,*/
-    @PostMapping("/{name}/users")
-    public MessageResponse addUserToEvent(@RequestBody @Valid AddUserToEventRequest addUserToEventRequest,
-                                          @PathVariable String name) {
-        return eventService.addUserToEvent(name, addUserToEventRequest.toUser());
+    @PostMapping("/adduser")
+    public MessageResponse addUserToEvent(@RequestBody @Valid AddUserToEventRequest addUserToEventRequest) {
+        return eventService.addUserToEvent(addUserToEventRequest);
+    }
+
+    // TODO: Get all users from event method. Should work properly since there are no more clones.
+
+    @GetMapping("/{eventId}/users")
+    public List<UserQueryResponse> getUsersFromEvent(@PathVariable String eventId) {
+        long eventIdInt = Long.parseLong(eventId);
+        return eventService.getUsersFromEvent(eventIdInt).stream().map(UserQueryResponse::new).toList();
     }
 }

@@ -8,6 +8,7 @@ import yte.intern.eventmanagement1.event.entity.Event;
 import yte.intern.eventmanagement1.event.repository.EventRepository;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
 import yte.intern.eventmanagement1.externalUser.repository.UserRepository;
+import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 import yte.intern.eventmanagement1.institutionUser.entity.InstitutionUser;
 import yte.intern.eventmanagement1.institutionUser.repository.InstitutionUserRepository;
 
@@ -42,9 +43,10 @@ public class InstitutionUserService {
     }
 
     @Transactional
-    public MessageResponse addEventToInstitution (String username, Event event) {
-        InstitutionUser institutionFromDB = institutionUserRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException(INSTITUTION_DOESNT_EXIST_MESSAGE.formatted(username)));
+    public MessageResponse addEventToInstitution (Event event) {
+        Long id = event.creatorInstId();
+        InstitutionUser institutionFromDB = institutionUserRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(INSTITUTION_DOESNT_EXIST_MESSAGE.formatted(id)));
 
         MessageResponse response = institutionFromDB.canAddEvent(event);
         if (response.hasError()) {
@@ -64,4 +66,18 @@ public class InstitutionUserService {
     }
 
     public List<InstitutionUser> getAllInstitutionUsers() {return institutionUserRepository.findAll();}
+
+    public InstitutionUser getInstitutionUser(String id) {
+        InstitutionUser institutionFromDB = institutionUserRepository.findById(Long.parseLong(id))
+            .orElseThrow(() -> new EntityNotFoundException(INSTITUTION_DOESNT_EXIST_MESSAGE.formatted(id)));
+        return institutionFromDB;
+    }
+
+    public MessageResponse updateEventForUser (AddEventToInstituteRequest event) {
+        Long id = event.getCreatorInstId();
+        InstitutionUser institutionFromDB = institutionUserRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(INSTITUTION_DOESNT_EXIST_MESSAGE.formatted(id)));
+
+
+    }
 }

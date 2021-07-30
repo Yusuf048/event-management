@@ -8,6 +8,7 @@ import yte.intern.eventmanagement1.common.enums.MessageType;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,10 +17,11 @@ import java.util.Set;
 @Getter
 public class Event extends BaseEntity {
     private String name;
-    private String startDate;
-    private String endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     //@Setter
     private Integer eventQuota;
+    private Long creatorInstId;
 
     // ManyToMany?
     @ManyToMany(cascade = CascadeType.ALL)
@@ -29,12 +31,13 @@ public class Event extends BaseEntity {
     protected Event() {
     }
 
-    public Event(final String name, final String startDate,
-                 final String endDate, final Integer eventQuota) {
+    public Event(final String name, final LocalDate startDate,
+                 final LocalDate endDate, final Integer eventQuota, final Long creatorInstId) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.eventQuota = eventQuota;
+        this.creatorInstId = creatorInstId;
     }
 
     /*public boolean hasSameNameAs(User user) {
