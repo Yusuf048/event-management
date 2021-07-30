@@ -22,6 +22,7 @@ import {Link, Redirect} from "react-router-dom";
 import {makeStyles} from "@material-ui/core/styles";
 import {AddUserToEvent, UserModel} from "./addUserToEvent/AddUserToEvent";
 import {ShowImages} from "./showImages/ShowImages";
+import {EnrolledEventList} from "./eventList/EnrolledEventList";
 //import QRCode from 'qrcode';
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +55,6 @@ export interface imageItems {
 export function ExternalUserView() {
     const classes = useStyles();
     let userDetails = JSON.parse(localStorage.getItem('user') as string);
-    var myUsername = "";
     //<img src={itemData[0].img} alt='img' />
     var itemData: imageItems[];
     itemData = [{
@@ -71,7 +71,8 @@ export function ExternalUserView() {
     const [eventName, setEventName] = useState("");
     const [imageUrl, setImageUrl] = useState('');
     const [allimagesUrl, setAllimagesUrl] = useState('');
-    const [isImagesOpen, setImagesOpen] = useState(false);
+    const [isImageOpen, setImageOpen] = useState(false);
+    const [isEventsOpen, setEventsOpen] = useState(false);
     //const [itemData, setItemData] = useState<imageItems[]>([]);
     const [isEventModelOpen, setEventModelOpen] = useState(false);
 
@@ -111,12 +112,11 @@ export function ExternalUserView() {
     }
 
     function fetchEnrolledEvents() {
-        if(getUsername()) {
+        if(userDetails) {
             console.log("in fetch enrolled events...");
             //let oldEvents = enrolledEventQueryResponse;
             console.log(eventApi.getEventsOfExternalUser(userDetails.tcKimlikNumber)
                 .then(data => setEnrolledEventQueryResponse(data)));
-            fillData();
         }
     }
 
@@ -179,29 +179,11 @@ export function ExternalUserView() {
 
 
     function fetchEvents() {
-        /*if(getUsername()) {
-            eventApi.getEventsOfExternalUser(userDetails.tcKimlikNumber)
-                .then(data => setEventQueryResponse(data));
-        } else {*/
-            eventApi.getEvents()
-                .then(data => setEventQueryResponse(data));
-        //}
+        eventApi.getEvents()
+            .then(data => setEventQueryResponse(data));
         fetchEnrolledEvents();
     }
 
-    function getUsername(): boolean {
-        if(userDetails != null) {
-            console.log(userDetails);
-            if(userDetails.username)
-                myUsername = userDetails.username
-            else if(userDetails.firstname != null)
-                console.log(userDetails.firstname);
-                myUsername = userDetails.firstname
-            return true;
-        }else{
-            return false;
-        }
-    }
 
     async function addUserToEvent(userModel: UserModel) {
         const messageResponse = await eventApi.addUserToEvent(userModel);
@@ -217,7 +199,6 @@ export function ExternalUserView() {
 
     useEffect(() => {
         fetchEvents();
-        getUsername();
     }, []);
 
     const addEvent = async (model: EventModel) => {
@@ -260,13 +241,16 @@ export function ExternalUserView() {
                 </ImageList>
             </div>*/
 
+    //<ShowImages itemData={itemData} setEventModelOpen={setEventModelOpen} isEventModelOpen={isEventModelOpen}/>
+
     return (
         <div>
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
-                        Welcome to Event Management {myUsername}
+                        Welcome to Event Management {userDetails.firstName}
                     </Typography>
+                    <Button disabled={userDetails == null} color="inherit" href="/logout">Log Out</Button>
                     <Button color="inherit" href="/logoutExt">Login</Button>
                 </Toolbar>
             </AppBar>
@@ -282,11 +266,13 @@ export function ExternalUserView() {
                     {imageUrl ? (<img src={imageUrl} alt="img"/>) : null}
                 </Grid>
             </Grid>
-            <Button color="primary" onClick={() => {setImagesOpen(true);
-                fillData();}}>Show Enrolled Events</Button>
+            <Button disabled={userDetails == null} color="primary" onClick={() => { if(isEventsOpen == false){
+                setEventsOpen(true)
+            } else {setEventsOpen(false)}
+            }}>Show Enrolled Events</Button>
 
             {
-                isImagesOpen && <ShowImages itemData={itemData} setEventModelOpen={setEventModelOpen} isEventModelOpen={isEventModelOpen}/>
+                isEventsOpen && <EnrolledEventList events={enrolledEventQueryResponse} setEventName={setEventName}/>
             }
 
 

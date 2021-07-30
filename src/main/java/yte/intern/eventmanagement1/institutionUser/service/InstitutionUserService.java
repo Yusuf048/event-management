@@ -73,11 +73,4 @@ public class InstitutionUserService {
         return institutionFromDB;
     }
 
-    public MessageResponse updateEventForUser (AddEventToInstituteRequest event) {
-        Long id = event.getCreatorInstId();
-        InstitutionUser institutionFromDB = institutionUserRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(INSTITUTION_DOESNT_EXIST_MESSAGE.formatted(id)));
-
-
-    }
 }

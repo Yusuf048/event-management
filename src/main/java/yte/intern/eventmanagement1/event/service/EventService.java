@@ -2,6 +2,7 @@ package yte.intern.eventmanagement1.event.service;
 
 import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import yte.intern.eventmanagement1.common.dto.MessageResponse;
 import yte.intern.eventmanagement1.common.enums.MessageType;
 import yte.intern.eventmanagement1.event.controller.request.AddUserToEventRequest;
@@ -9,6 +10,7 @@ import yte.intern.eventmanagement1.event.entity.Event;
 import yte.intern.eventmanagement1.event.repository.EventRepository;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
 import yte.intern.eventmanagement1.externalUser.repository.UserRepository;
+import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -124,6 +126,33 @@ public class EventService {
 
     public List<ExternalUser> getUsersFromEvent(Long id) {
         return eventRepository.findById(id).get().externalUsers().stream().toList();
+    }
+
+    public int[] getNumOfUsers() {
+        int sizeOfEvent = eventRepository.findAll().size();
+        int[] result = new int[sizeOfEvent];
+        Event eventFromDb;
+        for (int i = 0; i < sizeOfEvent; i++) {
+            Integer otherI = i+1;
+            eventFromDb = eventRepository.findById(Long.parseLong(otherI.toString())).get();
+            result[i] = eventFromDb.externalUsers().toArray().length;
+            System.out.println(result[i]);
+        }
+
+        return result;
+    }
+
+    public MessageResponse updateEvent(AddEventToInstituteRequest toBeUpdatedEvent) {
+        if(eventRepository.findByCreatorInstId(toBeUpdatedEvent.getCreatorInstId()).isPresent()){
+            Event event = eventRepository.findByCreatorInstId(toBeUpdatedEvent.getCreatorInstId()).get();
+            if(event.startDate().isBefore(LocalDate.now(ZoneId.of("GMT+3"))))
+                return new MessageResponse(MessageType.ERROR, "Event's starting date has already passed! Cannot update");
+            event.updateEvent(toBeUpdatedEvent);
+            eventRepository.save(event);
+            return new MessageResponse(MessageType.SUCCESS, "Event %s was successfully updated!".formatted(toBeUpdatedEvent.getName()));
+        } else {
+            return new MessageResponse(MessageType.ERROR, "The event to be updated was not found for this user");
+        }
     }
 
 }

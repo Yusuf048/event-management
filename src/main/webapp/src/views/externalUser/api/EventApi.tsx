@@ -59,13 +59,19 @@ export class EventApi {
         return response.data;
     }
 
+    async getNumOfUsersForEvents(): Promise<number[]> {
+        const response = await axios.get<number[]>("http://localhost:8080/events/userNumber");
+        return response.data;
+    }
+
     async getInstitutionUser(id: String): Promise<UserQueryResponse> {
         const response = await axios.get<UserQueryResponse>("http://localhost:8080/institution/"+id);
         return response.data;
     }
 
     async updateEvent(eventModel: InstituteEventModel): Promise<MessageResponse> {
-        const response = await axios.post<MessageResponse>("http://localhost:8080/institution/addevent", eventModel);
+        const response = await axios.post<MessageResponse>("http://localhost:8080/events/updateEvent", eventModel);
         return response.data;
     }
+
 }

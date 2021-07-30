@@ -2,6 +2,7 @@ import axios from "axios";
 import {EventQueryResponse, UserQueryResponse} from "../../externalUser/api/EventApi";
 
 export interface InstitutionUserQueryResponse {
+    id: number;
     username: string;
     password: string;
 }

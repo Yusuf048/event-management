@@ -14,6 +14,7 @@ import {AddEventToInstitute, InstituteEventModel} from "./addEventToInstitute/Ad
 import {ExternalUserView} from "../externalUser/ExternalUserView";
 import {ExternalUsersList} from "./showExternalUsers/ExternalUsersList";
 import {EventListForInstitution} from "./eventListForInstitution/EventListForInstitution";
+import {BarChart} from "./barChart/BarChart";
 //import {AddEvent, EventModel} from "../externalUser/addEvent/AddEvent";
 
 const useStyles = makeStyles((theme) => ({
@@ -36,12 +37,33 @@ export function InstitutionUserView() {
     const [userEventQueryResponse, setUserEventQueryResponse] = useState<EventQueryResponse[]>([]);
     const [isUserModelOpen, setUserModelOpen] = useState(false);
     const [eventUserQueryResponse, seteventUserQueryResponse] = useState<UserQueryResponse[]>([]);
+    const [isBarChartOpen, setBarChartOpen] = useState(false);
+    const [chartEvents, setChartEvents] = useState<string[]>([]);
+    const [chartUsersNumber, setChartUsersNumber] = useState<number[]>([]);
 
     const userEventApi = new EventApi();
 
     function fetchEvents() {
         console.log(userEventApi.getEventsOfUser(userDetails.username)
             .then(data => setUserEventQueryResponse(data)));
+    }
+
+    function setChartData() {
+        let count = 0;
+        let tempEvents = chartEvents;
+        //let tempUserNums = chartUsersNumber
+
+        userEventQueryResponse.forEach((singleEvent) => {
+            tempEvents[count] = singleEvent.name;
+            setChartEvents(tempEvents);
+
+            count++;
+        })
+        fetchNumOfUsersForEvents();
+    }
+
+    function fetchNumOfUsersForEvents() {
+        console.log(userEventApi.getNumOfUsersForEvents().then(data => setChartUsersNumber(data)));
     }
 
     function fetchUsersForEvent(eventId: String) {
@@ -80,19 +102,35 @@ export function InstitutionUserView() {
                       handleClose={() => setAddEventModelOpen(false)}
                       addEventToInstitute={addEventToInstitute}
                       currentInstitutionId={userDetails.id}/>
-            <EventListForInstitution events={userEventQueryResponse} fetchUsersForEvent={fetchUsersForEvent}/>
+            <EventListForInstitution events={userEventQueryResponse} fetchUsersForEvent={fetchUsersForEvent} fetchEvents={fetchEvents}/>
             <Grid container justifyContent="center" className={classes.root} spacing={10}>
                 <Grid item xs={3}>
-                    <Button color="primary" variant="contained" onClick={() => setUserModelOpen(true)}>Show Users</Button>
-                </Grid>
-                <Grid item xs={3}>
-                    <Button color="secondary" variant="contained" onClick={() => setUserModelOpen(false)}>Hide Users</Button>
+                    <Button color="primary" variant="contained" onClick={() =>{
+                        setUserModelOpen(true);
+                        setBarChartOpen(true);
+                        setChartData();
+                    }}>Show Details</Button>
                 </Grid>
 
+                <Grid item xs={3}>
+                    <Button color="secondary" variant="contained" onClick={() => {
+                        setUserModelOpen(false);
+                        setBarChartOpen(false);}}>Hide Details</Button>
+                </Grid>
             </Grid>
-            {
-                isUserModelOpen && <ExternalUsersList users={eventUserQueryResponse}/>
-            }
+
+            <Grid container spacing={3}>
+                <Grid item xs={6}>
+                    {
+                        isUserModelOpen && <ExternalUsersList users={eventUserQueryResponse}/>
+                    }
+                </Grid>
+                <Grid item xs={6}>
+                    {
+                        isBarChartOpen && <BarChart events={chartEvents} userNums={chartUsersNumber}/>
+                    }
+                </Grid>
+            </Grid>
         </div>
 
     );

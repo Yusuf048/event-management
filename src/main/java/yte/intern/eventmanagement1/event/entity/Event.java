@@ -6,6 +6,7 @@ import yte.intern.eventmanagement1.common.dto.MessageResponse;
 import yte.intern.eventmanagement1.common.entity.BaseEntity;
 import yte.intern.eventmanagement1.common.enums.MessageType;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
+import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -44,11 +45,11 @@ public class Event extends BaseEntity {
         return name.equals(user.name);
     }*/
 
-    public void updateEvent(final Event updatedEvent) {
-        this.name = updatedEvent.name;
-        this.startDate = updatedEvent.startDate;
-        this.endDate = updatedEvent.endDate;
-        this.eventQuota = updatedEvent.eventQuota;
+    public void updateEvent(final AddEventToInstituteRequest updatedEvent) {
+        this.name = updatedEvent.getName();
+        this.startDate = updatedEvent.getStartDate();
+        this.endDate = updatedEvent.getEndDate();
+        this.eventQuota = updatedEvent.getEventQuota();
     }
 
     public MessageResponse canAddUser(final ExternalUser toBeAddedExternalUser) {

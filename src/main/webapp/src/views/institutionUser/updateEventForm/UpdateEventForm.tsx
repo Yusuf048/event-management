@@ -25,11 +25,12 @@ const initialState: InstituteEventModel = {
     creatorInstId: -1
 };
 
+
 export function UpdateEventForm(props: Props) {
 
     const [eventModel, setEventModel] = useState<InstituteEventModel>(props.initialEvent);
 
-    const onFormChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const onUpdateFormChange = (event: ChangeEvent<HTMLInputElement>) => {
         const field = event.target.name;
         const value = event.target.value;
         //const numValue = parseInt(event.target.valueAsNumber.toString());
@@ -38,19 +39,24 @@ export function UpdateEventForm(props: Props) {
     }
 
     function updateFormState(field: string, value: string) {
-        const newModelState = {...eventModel};
+        //const newModelState = {...eventModel};
+        const newModelState = props.initialEvent;
         switch (field) {
             case "name":
-                newModelState.name = value;
+                if(value != "")
+                    newModelState.name = value;
                 break;
             case "startDate":
-                newModelState.startDate = value;
+                if(value != "")
+                    newModelState.startDate = value;
                 break;
             case "endDate":
-                newModelState.endDate = value;
+                if(value != "")
+                    newModelState.endDate = value;
                 break;
             case "eventQuota":
-                newModelState.eventQuota = value;
+                if(value != "")
+                    newModelState.eventQuota = value;
                 break;
         }
         newModelState.creatorInstId = props.currentInstitutionId;
@@ -64,16 +70,16 @@ export function UpdateEventForm(props: Props) {
             onClose={props.handleClose}>
             <DialogTitle>Add Event</DialogTitle>
             <DialogContent>
-                <TextField onChange={onFormChange} fullWidth name="name" label="Name"/>
-                <TextField onChange={onFormChange} fullWidth name="startDate" label="Start Date"/>
-                <TextField onChange={onFormChange} fullWidth name="endDate" label="End Date"/>
-                <TextField onChange={onFormChange} fullWidth name="eventQuota" label="Event Quota"/>
+                <TextField onChange={onUpdateFormChange} fullWidth name="name" label={props.initialEvent.name}/>
+                <TextField onChange={onUpdateFormChange} fullWidth name="startDate" label={props.initialEvent.startDate}/>
+                <TextField onChange={onUpdateFormChange} fullWidth name="endDate" label={props.initialEvent.endDate}/>
+                <TextField onChange={onUpdateFormChange} fullWidth name="eventQuota" label={props.initialEvent.eventQuota}/>
             </DialogContent>
             <DialogActions>
                 <Button onClick={props.handleClose} color="secondary">
                     Cancel
                 </Button>
-                <Button onClick={() => props.addEventToInstitute(eventModel)} color="primary">
+                <Button onClick={() => props.updateEventForInstitute(eventModel)} color="primary">
                     Submit
                 </Button>
             </DialogActions>

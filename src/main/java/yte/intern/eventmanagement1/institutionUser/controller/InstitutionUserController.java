@@ -29,6 +29,7 @@ public class InstitutionUserController {
     public InstitutionUserController(final InstitutionUserService institutionUserService) {this.institutionUserService = institutionUserService;}
 
     @GetMapping("/{username}/events")
+    @CrossOrigin(origins = "http://localhost:3000")
     public List<EventQueryResponse> getAllEvents(@PathVariable String username) {
         return institutionUserService.getAllEventsFromInstitute(username)
                 .stream()
@@ -39,6 +40,7 @@ public class InstitutionUserController {
     // Names are unique for events
     /*@PathVariable String name,*/
     @PostMapping("/addevent")
+    @CrossOrigin(origins = "http://localhost:3000")
     public MessageResponse addEventToInstitute(@RequestBody @Valid AddEventToInstituteRequest addEventToInstituteRequest) {
         if(addEventToInstituteRequest.getStartDate().isBefore(LocalDate.now(ZoneId.of("GMT+3")))){
             return new MessageResponse(MessageType.ERROR, "Event cannot have the start date %s because it is before today"
@@ -64,12 +66,13 @@ public class InstitutionUserController {
     }
 
     @GetMapping("/{userid}")
+    @CrossOrigin(origins = "http://localhost:3000")
     public InstitutionUserQueryResponse getInstitutionUser(@PathVariable String userid) {
         return new InstitutionUserQueryResponse(institutionUserService.getInstitutionUser(userid));
     }
 
-    @PostMapping
+    /*@PostMapping
     public MessageResponse updateEventForUser(@RequestBody @Valid final AddEventToInstituteRequest addEventToInstituteRequest) {
         return institutionUserService.updateEventForUser(addEventToInstituteRequest);
-    }
+    }*/
 }

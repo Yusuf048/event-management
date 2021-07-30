@@ -35,9 +35,9 @@ public class InstitutionUser extends BaseEntity {
         this.password = password;
     }
 
-    public void updateEvent(final AddEventToInstituteRequest toBeUpdatedEvent) {
+    /*public void updateEvent(final AddEventToInstituteRequest toBeUpdatedEvent) {
         myEvents.stream().map(BaseEntity::id).forEach(aLong -> if(aLong == toBeUpdatedEvent.getId())) );
-    }
+    }*/
 
     public MessageResponse canAddEvent(final Event toBeAddedEvent) {
         if (toBeAddedEvent.quotaIsLessThanZero()) {

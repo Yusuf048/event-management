@@ -29,6 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{tcKimlikNumber}/events")
+    @CrossOrigin(origins = "http://localhost:3000")
     public List<EventQueryResponse> getAllEventsForUser(@PathVariable String tcKimlikNumber) {
         return userService.getAllEventsOfUser(tcKimlikNumber).stream().map(EventQueryResponse::new).toList();
     }

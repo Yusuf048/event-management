@@ -8,6 +8,7 @@ import yte.intern.eventmanagement1.event.controller.response.EventQueryResponse;
 import yte.intern.eventmanagement1.event.service.EventService;
 import yte.intern.eventmanagement1.event.controller.request.AddEventRequest;
 import yte.intern.eventmanagement1.externalUser.controller.response.UserQueryResponse;
+import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 @Validated
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class EventController {
     private final EventService eventService;
 
@@ -38,6 +39,7 @@ public class EventController {
     // Names are unique for events
     /*@PathVariable String name,*/
     @PostMapping("/adduser")
+    //@CrossOrigin(origins = "http://localhost:3000")
     public MessageResponse addUserToEvent(@RequestBody @Valid AddUserToEventRequest addUserToEventRequest) {
         return eventService.addUserToEvent(addUserToEventRequest);
     }
@@ -45,8 +47,22 @@ public class EventController {
     // TODO: Get all users from event method. Should work properly since there are no more clones.
 
     @GetMapping("/{eventId}/users")
+    //@CrossOrigin(origins = "http://localhost:3000")
     public List<UserQueryResponse> getUsersFromEvent(@PathVariable String eventId) {
-        long eventIdInt = Long.parseLong(eventId);
-        return eventService.getUsersFromEvent(eventIdInt).stream().map(UserQueryResponse::new).toList();
+        long eventIdLong = Long.parseLong(eventId);
+        return eventService.getUsersFromEvent(eventIdLong).stream().map(UserQueryResponse::new).toList();
+    }
+
+    @PostMapping("/updateEvent")
+    //@CrossOrigin(origins = "http://localhost:3000")
+    public MessageResponse updateEvent(@RequestBody @Valid final AddEventToInstituteRequest addEventToInstituteRequest) {
+        return eventService.updateEvent(addEventToInstituteRequest);
+    }
+
+    @GetMapping("/userNumber")
+    //@CrossOrigin(origins = "http://localhost:3000")
+    public int[] getNumOfUsersForEvent() {
+        //long eventIdLong = Long.parseLong(eventId);
+        return eventService.getNumOfUsers();
     }
 }
