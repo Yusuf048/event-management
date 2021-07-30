@@ -51,7 +51,6 @@ export function InstitutionUserView() {
     function setChartData() {
         let count = 0;
         let tempEvents = chartEvents;
-        //let tempUserNums = chartUsersNumber
 
         userEventQueryResponse.forEach((singleEvent) => {
             tempEvents[count] = singleEvent.name;

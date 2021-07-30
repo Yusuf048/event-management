@@ -12,7 +12,7 @@ export function BarChart(props: Props) {
         labels: props.events,
         datasets: [
             {
-                label: 'Events',
+                label: 'Users',
                 backgroundColor: 'rgba(75,192,192,1)',
                 borderColor: 'rgba(0,0,0,1)',
                 borderWidth: 2,
@@ -23,6 +23,7 @@ export function BarChart(props: Props) {
 
     return(
         <div>
+            <h1>Barchart of Users in Events</h1>
             <Bar
                 data={state}
                 options={{

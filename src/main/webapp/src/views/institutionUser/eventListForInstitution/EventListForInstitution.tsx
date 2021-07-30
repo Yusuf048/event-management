@@ -9,11 +9,11 @@ import {toast} from "react-toastify";
 import {render} from "react-dom";
 
 const tableColumns = [
-    {field: "id", headerName: "ID", width: 120},
+    {field: "id", headerName: "ID", width: 100},
     {field: "name", headerName: "NAME", width: 250},
-    {field: "startDate", headerName: "STARTDATE", width: 250},
-    {field: "endDate", headerName: "ENDDATE", width: 250},
-    {field: "eventQuota", headerName: "EVENTQUOTA", width: 250},
+    {field: "startDate", headerName: "STARTDATE", width: 220},
+    {field: "endDate", headerName: "ENDDATE", width: 220},
+    {field: "eventQuota", headerName: "EVENTQUOTA", width: 200},
     {field: "updateEvent", width: 200,
         headerName: "UPDATEEVENT",
         disableClickEventBubbling: true,
