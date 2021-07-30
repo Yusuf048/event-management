@@ -11,9 +11,10 @@ public class EventQueryResponse {
     private final Long id;
 
     private final String name;
-    private final String startDate;
-    private final String endDate;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
     private final Integer eventQuota;
+    private final Long creatorInstId;
 
     public EventQueryResponse(final Event event) {
         this.id = event.id();
@@ -21,5 +22,6 @@ public class EventQueryResponse {
         this.startDate = event.startDate();
         this.endDate = event.endDate();
         this.eventQuota = event.eventQuota();
+        this.creatorInstId = event.creatorInstId();
     }
 }

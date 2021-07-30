@@ -9,6 +9,7 @@ import yte.intern.eventmanagement1.event.entity.Event;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -23,19 +24,21 @@ public class AddEventRequest {
     // ADD IN DATE RANGE
     //@DateTimeFormat
     //@Valid
-    @NotEmpty(message = "Start date can't be empty")
-    private final String startDate;
+    @NotNull(message = "Start date was null")
+    private final LocalDate startDate;
 
     //@DateTimeFormat
     //@Valid
-    @NotEmpty(message = "End date can't be empty")
-    private final String endDate;
+    @NotNull(message = "End date was null")
+    private final LocalDate endDate;
 
-    @NotEmpty(message = "Event Quota can't be empty")
+    @NotNull(message = "Event Quota can't be empty")
     private final Integer eventQuota;
+
+    private final Long institutionId;
 
 
     public Event toEvent() {
-        return new Event(name, startDate, endDate, eventQuota);
+        return new Event(name, startDate, endDate, eventQuota, institutionId);
     }
 }

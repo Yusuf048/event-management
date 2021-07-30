@@ -10,8 +10,11 @@ import {
 } from "@material-ui/core";
 import React, {ChangeEvent, useState, useReducer, useEffect} from "react";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import {EventApi, EventQueryResponse} from "../../externalUser/api/EventApi";
+import {EventApi, EventQueryResponse, UserQueryResponse} from "../../externalUser/api/EventApi";
 import {InstitutionUserQueryResponse, LoginApi} from "../api/LoginApi";
+import {ToastContainer, toast} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import {Simulate} from "react-dom/test-utils";
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -107,6 +110,7 @@ const Login = () => {
     const classes = useStyles();
     const [state, dispatch] = useReducer(reducer, initialState);
     const [InstitutionUserQueryResponse, setInstitutionUserQueryResponse] = useState<InstitutionUserQueryResponse[]>([]);
+    const [ExternalUserQueryResponse, setExternalUserQueryResponse] = useState<UserQueryResponse[]>([]);
 
     const loginApi = new LoginApi();
 
@@ -115,8 +119,13 @@ const Login = () => {
             .then(data => setInstitutionUserQueryResponse(data));
     }
 
+    function fetchExternalUsers() {
+        loginApi.getExternalUsers().then(data => setExternalUserQueryResponse(data));
+    }
+
     useEffect(() => {
         fetchInstitutionUsers();
+        fetchExternalUsers();
     }, []);
 
     useEffect(() => {
@@ -135,16 +144,50 @@ const Login = () => {
 
     const handleLogin = () => {
         fetchInstitutionUsers();
-        if (state.username === InstitutionUserQueryResponse[0].username && state.password === InstitutionUserQueryResponse[0].password) {
-            dispatch({
-                type: 'loginSuccess',
-                payload: 'Login Successful'
-            });
+        fetchExternalUsers();
+        let count = 0;
+        let institutionSuccess = false;
+        let externalSuccess = false;
+
+        while(InstitutionUserQueryResponse[count] != null) {
+            if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
+                dispatch({
+                    type: 'loginSuccess',
+                    payload: 'Login Successful'
+                });
+                toast.success("Login Successful!");
+                institutionSuccess = true;
+                localStorage.setItem("user", JSON.stringify(InstitutionUserQueryResponse[count]))
+                console.log(InstitutionUserQueryResponse[count]);
+                break;
+            }
+            if (state.username === ExternalUserQueryResponse[count].email && state.password === ExternalUserQueryResponse[count].password) {
+                dispatch({
+                    type: 'loginSuccess',
+                    payload: 'Login Successful'
+                });
+                toast.success("Login Successful!");
+                externalSuccess = true;
+                localStorage.setItem("user", JSON.stringify(ExternalUserQueryResponse[count]))
+                console.log(ExternalUserQueryResponse[count]);
+                break;
+            }
+            count++;
+        }
+        if(institutionSuccess) {
+            setTimeout(function() {
+                window.location.replace('/institution/:InstitutionUserQueryResponse[count].username');
+            }, 2000);
+        } else if(externalSuccess) {
+            setTimeout(function() {
+                window.location.replace('/');
+            }, 2000);
         } else {
             dispatch({
                 type: 'loginFailed',
                 payload: 'Incorrect username or password'
             });
+            toast.error("Login Unsuccessful");
         }
     };
 
@@ -180,7 +223,7 @@ const Login = () => {
                             fullWidth
                             id="username"
                             type="email"
-                            label="Username"
+                            label="Username/Email"
                             placeholder="Username"
                             margin="normal"
                             onChange={handleUsernameChange}

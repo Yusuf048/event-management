@@ -1,5 +1,6 @@
 import {DataGrid} from "@material-ui/data-grid";
 import {EventQueryResponse} from "../api/EventApi";
+import {Dispatch, SetStateAction, useState} from "react";
 
 const tableColumns = [
     {field: "id", headerName: "ID", width: 120},
@@ -11,13 +12,21 @@ const tableColumns = [
 
 interface Props {
     events: EventQueryResponse[]
+    setButtonOpen: Dispatch<SetStateAction<boolean>>
+    setEventName: Dispatch<SetStateAction<string>>
 }
 
 export function EventList(props: Props) {
     console.log(props.events)
     return (
         <div style={{height: 400, width: '100%'}}>
-            <DataGrid columns={tableColumns} rows={props.events} pageSize={5}/>
+            <DataGrid columns={tableColumns} rows={props.events} pageSize={5} disableMultipleSelection
+            onRowSelected={(newSelection) => {
+                var eventName = newSelection.data.name;
+                console.log(eventName);
+                props.setEventName(eventName);
+                props.setButtonOpen(true);
+            }}/>
         </div>
     );
 }

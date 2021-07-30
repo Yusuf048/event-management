@@ -4,6 +4,7 @@ import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import yte.intern.eventmanagement1.common.dto.MessageResponse;
 import yte.intern.eventmanagement1.common.enums.MessageType;
+import yte.intern.eventmanagement1.event.controller.request.AddUserToEventRequest;
 import yte.intern.eventmanagement1.event.entity.Event;
 import yte.intern.eventmanagement1.event.repository.EventRepository;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
@@ -11,6 +12,9 @@ import yte.intern.eventmanagement1.externalUser.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +35,21 @@ public class EventService {
         this.userRepository = userRepository;
     }
 
-    public List<Event> getAllEvents() {return eventRepository.findAll();}
+    // Get all events with dates that are not before today
+    public List<Event> getAllEvents() {
+        List<Event> allEvents = eventRepository.findAll();
+        List<Event> shownEvents = new LinkedList<Event>();
+        for(int i = 0; i < allEvents.size(); i++) {
+            if (!(allEvents.get(i).startDate().isBefore(LocalDate.now(ZoneId.of("GMT+3"))))) {
+                shownEvents.add(allEvents.get(i));
+            }
+        }
+
+        return shownEvents;
+    }
 
     // Add new event and return a message response
+    // MAY DEPRECATE: EVENT NEEDS AN INSTITUTION USER
     public MessageResponse addEvent(final Event newEvent) {
         if (eventRepository.existsByName(newEvent.name())) {
             return new MessageResponse(MessageType.ERROR, eventAlreadyExistsMessage(newEvent.name()));
@@ -70,24 +86,44 @@ public class EventService {
 
     // Add user to an event using event name (event names are unique)
     @Transactional
-    public MessageResponse addUserToEvent(String eventName, ExternalUser externalUser) {
+    public MessageResponse addUserToEvent(AddUserToEventRequest addUserToEventRequest) {
+        String tc = addUserToEventRequest.getTcKimlikNumber();
+        String eventName = addUserToEventRequest.getEnrolledEventName();
         Event eventFromDB = eventRepository.findByName(eventName)
                 .orElseThrow(() -> new EntityNotFoundException(EVENT_DOESNT_EXIST_MESSAGE.formatted(eventName)));
 
-        MessageResponse response = eventFromDB.canAddUser(externalUser);
-        if (response.hasError()) {
-            return response;
+        // Find if user already exists
+        if (userRepository.existsByTcKimlikNumber(tc)) {
+            ExternalUser existingUser =  userRepository.findByTcKimlikNumber(tc);
+
+            // If so, add the event to the existing user and add the existing usr to event
+            existingUser.addEvent(eventFromDB);
+            MessageResponse response = eventFromDB.canAddUser(existingUser);
+            if (response.hasError()) {
+                return response;
+            }
+            eventFromDB.addUser(existingUser);
+            eventRepository.save(eventFromDB);
+            return new MessageResponse(MessageType.SUCCESS, "The existing user %s was successfully added to the event!".formatted(existingUser.firstName()));
+        } else {
+            // Else create a new user with constructor
+            ExternalUser externalUser = addUserToEventRequest.toUser();
+            externalUser.addEvent(eventFromDB);
+            userRepository.save(externalUser);
+
+            MessageResponse response = eventFromDB.canAddUser(externalUser);
+            if (response.hasError()) {
+                return response;
+            }
+
+            eventFromDB.addUser(externalUser);
+            eventRepository.save(eventFromDB);
+            return new MessageResponse(MessageType.SUCCESS, "User %s has been sucessfully added to the event!".formatted(externalUser.firstName()));
         }
+    }
 
-        /*if (userRepository.existsByTcKimlikNumber(externalUser.tcKimlikNumber())) {
-            ExternalUser existingUser =  userRepository.findByTcKimlikNumber(externalUser.tcKimlikNumber());
-
-            return new MessageResponse(MessageType.ERROR, userAlreadyExistsMessage(newExternalUser.tcKimlikNumber()));
-        }*/
-
-        eventFromDB.addUser(externalUser);
-        eventRepository.save(eventFromDB);
-        return new MessageResponse(MessageType.SUCCESS, "User %s has been sucessfully added to the event!".formatted(externalUser.firstName()));
+    public List<ExternalUser> getUsersFromEvent(Long id) {
+        return eventRepository.findById(id).get().externalUsers().stream().toList();
     }
 
 }

@@ -1,8 +1,10 @@
 package yte.intern.eventmanagement1.externalUser.service;
 
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import yte.intern.eventmanagement1.common.dto.MessageResponse;
 import yte.intern.eventmanagement1.common.enums.MessageType;
+import yte.intern.eventmanagement1.event.entity.Event;
 import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
 import yte.intern.eventmanagement1.externalUser.repository.UserRepository;
 
@@ -19,6 +21,14 @@ public class UserService {
     public UserService(final UserRepository userRepository) {this.userRepository = userRepository;}
 
     public List<ExternalUser> getAllUsers() {return userRepository.findAll();}
+
+    public List<Event> getAllEventsOfUser(String tcKimlikNumber) {
+
+        ExternalUser userFromDB = userRepository.findByTcKimlikNumber(tcKimlikNumber);
+        return userFromDB.extEvents().stream().toList();
+    }
+
+    //public List<ExternalUser> getSameTcUsers(String tcKimlikNumber) {return userRepository.findAllByTcKimlikNumber(tcKimlikNumber);}
 
     private String userAddedMessage(final String userName) {
         return USER_ADDED_MESSAGE.formatted(userName);
