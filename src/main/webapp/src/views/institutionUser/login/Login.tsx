@@ -149,30 +149,46 @@ const Login = () => {
         let institutionSuccess = false;
         let externalSuccess = false;
 
-        while(InstitutionUserQueryResponse[count] != null) {
-            if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
-                dispatch({
-                    type: 'loginSuccess',
-                    payload: 'Login Successful'
-                });
-                toast.success("Login Successful!");
-                institutionSuccess = true;
-                localStorage.setItem("user", JSON.stringify(InstitutionUserQueryResponse[count]))
-                console.log(InstitutionUserQueryResponse[count]);
-                break;
+        if(ExternalUserQueryResponse == undefined) {
+            while(InstitutionUserQueryResponse[count] != null) {
+                if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
+                    dispatch({
+                        type: 'loginSuccess',
+                        payload: 'Login Successful'
+                    });
+                    toast.success("Login Successful!");
+                    institutionSuccess = true;
+                    localStorage.setItem("user", JSON.stringify(InstitutionUserQueryResponse[count]))
+                    console.log(InstitutionUserQueryResponse[count]);
+                    break;
+                }
+                count++;
             }
-            if (state.username === ExternalUserQueryResponse[count].email && state.password === ExternalUserQueryResponse[count].password) {
-                dispatch({
-                    type: 'loginSuccess',
-                    payload: 'Login Successful'
-                });
-                toast.success("Login Successful!");
-                externalSuccess = true;
-                localStorage.setItem("user", JSON.stringify(ExternalUserQueryResponse[count]))
-                console.log(ExternalUserQueryResponse[count]);
-                break;
+        } else {
+            while(InstitutionUserQueryResponse[count] != null || ExternalUserQueryResponse[count] != null) {
+                if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
+                    dispatch({
+                        type: 'loginSuccess',
+                        payload: 'Login Successful'
+                    });
+                    toast.success("Login Successful!");
+                    institutionSuccess = true;
+                    localStorage.setItem("user", JSON.stringify(InstitutionUserQueryResponse[count]))
+                    console.log(InstitutionUserQueryResponse[count]);
+                    break;
+                } else if (state.username === ExternalUserQueryResponse[count]?.email && state.password === ExternalUserQueryResponse[count]?.password) {
+                    dispatch({
+                        type: 'loginSuccess',
+                        payload: 'Login Successful'
+                    });
+                    toast.success("Login Successful!");
+                    externalSuccess = true;
+                    localStorage.setItem("user", JSON.stringify(ExternalUserQueryResponse[count]))
+                    console.log(ExternalUserQueryResponse[count]);
+                    break;
+                }
+                count++;
             }
-            count++;
         }
         if(institutionSuccess) {
             setTimeout(function() {
