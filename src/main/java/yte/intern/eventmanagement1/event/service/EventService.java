@@ -77,6 +77,7 @@ public class EventService {
     // Maybe add update event class here
 
     // Delete event using event name (event names are unique)
+    @Transactional
     public MessageResponse deleteEvent(String eventName) {
         if (!eventRepository.existsByName(eventName)) {
             return new MessageResponse(MessageType.ERROR, EVENT_DOESNT_EXIST_MESSAGE.formatted(eventName));
@@ -142,13 +143,18 @@ public class EventService {
         return result;
     }
 
+    @Transactional
     public MessageResponse updateEvent(AddEventToInstituteRequest toBeUpdatedEvent) {
         if(eventRepository.findByCreatorInstId(toBeUpdatedEvent.getCreatorInstId()).isPresent()){
             Event event = eventRepository.findByCreatorInstId(toBeUpdatedEvent.getCreatorInstId()).get();
             if(event.startDate().isBefore(LocalDate.now(ZoneId.of("GMT+3"))))
                 return new MessageResponse(MessageType.ERROR, "Event's starting date has already passed! Cannot update");
-            event.updateEvent(toBeUpdatedEvent);
-            eventRepository.save(event);
+
+            //eventRepository.deleteByName(event.name());
+            Event myEvent = event.updateEvent(toBeUpdatedEvent);
+            //eventRepository.deleteByCreatorInstId(event.creatorInstId());
+
+            eventRepository.save(myEvent);
             return new MessageResponse(MessageType.SUCCESS, "Event %s was successfully updated!".formatted(toBeUpdatedEvent.getName()));
         } else {
             return new MessageResponse(MessageType.ERROR, "The event to be updated was not found for this user");

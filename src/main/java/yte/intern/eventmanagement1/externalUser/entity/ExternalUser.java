@@ -25,6 +25,10 @@ public class ExternalUser extends BaseEntity {
     @JoinColumn(name = "ext_user_id")
     private Set<Event> extEvents = new HashSet<>();
 
+    //@Todo add dates in external user
+    /*@M
+    private Set<int> dates = new HashSet<>();*/
+
 
     protected ExternalUser() {}
 

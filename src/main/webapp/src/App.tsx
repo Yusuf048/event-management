@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { ExternalUserView } from './views/externalUser/ExternalUserView';
 import Login from "./views/institutionUser/login/Login";
 //import {Router} from "@material-ui/icons";
@@ -22,12 +22,14 @@ import {InstitutionUserView} from "./views/institutionUser/InstitutionUserView";
 //                 return(<Redirect to="/" />)} }/>
 
 function App() {
+    const [dates, setDates] = useState<number[]>([]);
+    const [events, setEvents] = useState<string[]>([]);
   return (
     <Router>
         <div className="App">
-            <Route path="/" exact component={ExternalUserView} />
+            <Route path="/" exact component={() => <ExternalUserView dates={dates} setDates={setDates}/>} />
             <Route path="/login" exact component={Login} />
-            <Route path="/institution/:username" exact component={InstitutionUserView} />
+            <Route path="/institution/:username" exact component={() => <InstitutionUserView dates={dates}/>} />
             <Route path="/logout" exact component={() => {
                  localStorage.removeItem("user");
                  return(<Redirect to="/" />)} }/>

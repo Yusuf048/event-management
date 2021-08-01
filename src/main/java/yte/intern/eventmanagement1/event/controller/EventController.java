@@ -44,7 +44,6 @@ public class EventController {
         return eventService.addUserToEvent(addUserToEventRequest);
     }
 
-    // TODO: Get all users from event method. Should work properly since there are no more clones.
 
     @GetMapping("/{eventId}/users")
     //@CrossOrigin(origins = "http://localhost:3000")

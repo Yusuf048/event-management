@@ -17,10 +17,12 @@ public class AddUserToEventRequest {
     private final String lastName;
     @Size(min = 11, max = 11, message = "TC Kimlik number must be 11 characters long")
     private final String tcKimlikNumber;
+
+    private final String email;
     @NotBlank
     private final String enrolledEventName;
 
     public ExternalUser toUser() {
-        return new ExternalUser(firstName, lastName, tcKimlikNumber, enrolledEventName, "", "");
+        return new ExternalUser(firstName, lastName, tcKimlikNumber, enrolledEventName, email, "");
     }
 }

@@ -9,8 +9,11 @@ import yte.intern.eventmanagement1.externalUser.entity.ExternalUser;
 import yte.intern.eventmanagement1.institutionUser.controller.request.AddEventToInstituteRequest;
 
 import javax.persistence.*;
+import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,7 +27,7 @@ public class Event extends BaseEntity {
     private Integer eventQuota;
     private Long creatorInstId;
 
-    // ManyToMany?
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
     private Set<ExternalUser> externalUsers = new HashSet<>();
@@ -45,11 +48,12 @@ public class Event extends BaseEntity {
         return name.equals(user.name);
     }*/
 
-    public void updateEvent(final AddEventToInstituteRequest updatedEvent) {
+    public Event updateEvent(final AddEventToInstituteRequest updatedEvent) {
         this.name = updatedEvent.getName();
         this.startDate = updatedEvent.getStartDate();
         this.endDate = updatedEvent.getEndDate();
         this.eventQuota = updatedEvent.getEventQuota();
+        return this;
     }
 
     public MessageResponse canAddUser(final ExternalUser toBeAddedExternalUser) {

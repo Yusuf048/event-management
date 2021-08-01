@@ -1,5 +1,6 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@material-ui/core";
 import {ChangeEvent, useState} from "react";
+import {ExternalUserView} from "../../externalUser/ExternalUserView";
 
 interface Props {
     isOpen: boolean;

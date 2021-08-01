@@ -29,7 +29,11 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export function InstitutionUserView() {
+interface Props {
+    dates: number[]
+}
+
+export function InstitutionUserView(props: Props) {
     const classes = useStyles();
     let userDetails = JSON.parse(localStorage.getItem('user') as string);
 
@@ -127,6 +131,11 @@ export function InstitutionUserView() {
                 <Grid item xs={6}>
                     {
                         isBarChartOpen && <BarChart events={chartEvents} userNums={chartUsersNumber}/>
+                    }
+                </Grid>
+                <Grid item xs={6}>
+                    {
+                        isBarChartOpen && <BarChart events={chartEvents} userNums={props.dates}/>
                     }
                 </Grid>
             </Grid>

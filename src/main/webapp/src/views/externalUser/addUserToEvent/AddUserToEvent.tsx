@@ -12,6 +12,7 @@ interface Props {
 export interface UserModel {
     firstName: string;
     lastName: string;
+    email: string;
     tcKimlikNumber: string;
     enrolledEventName: string
 }
@@ -19,6 +20,7 @@ export interface UserModel {
 const initialState: UserModel = {
     firstName: "",
     lastName: "",
+    email: "",
     tcKimlikNumber: "",
     enrolledEventName: ""
 };
@@ -44,6 +46,9 @@ export function AddUserToEvent(props: Props) {
             case "lastname":
                 newModelState.lastName = value;
                 break;
+            case "email":
+                newModelState.email = value;
+                break;
             case "tcKimlikNumber":
                 newModelState.tcKimlikNumber = value;
                 break;
@@ -60,6 +65,7 @@ export function AddUserToEvent(props: Props) {
             <DialogContent>
                 <TextField onChange={onFormChange} fullWidth name="firstname" label="First Name"/>
                 <TextField onChange={onFormChange} fullWidth name="lastname" label="Last Name"/>
+                <TextField onChange={onFormChange} fullWidth name="email" label="Email"/>
                 <TextField onChange={onFormChange} fullWidth name="tcKimlikNumber" label="Tc Kimlik Number"/>
             </DialogContent>
             <DialogActions>

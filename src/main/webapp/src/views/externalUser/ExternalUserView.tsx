@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {EventApi, EventQueryResponse, UserQueryResponse} from "./api/EventApi";
 import {AddEvent, EventModel} from "./addEvent/AddEvent";
 import {MessageType} from "../../common/dto/MessageResponse";
@@ -6,9 +6,7 @@ import {toast} from "react-toastify";
 import {
     AppBar,
     Button,
-    Grid,
-    IconButton, ImageList, ImageListItem,
-    ImageListItemBar, ListSubheader,
+    Grid, Modal,
     Paper,
     TextField,
     Toolbar,
@@ -23,7 +21,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {AddUserToEvent, UserModel} from "./addUserToEvent/AddUserToEvent";
 import {ShowImages} from "./showImages/ShowImages";
 import {EnrolledEventList} from "./eventList/EnrolledEventList";
-//import QRCode from 'qrcode';
+import { send } from 'emailjs-com';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,7 +42,16 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
     },
+    paper: {
+        position: 'absolute',
+        width: 400,
+        backgroundColor: theme.palette.background.paper,
+        border: '2px solid #000',
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+    },
 }));
+
 
 export interface imageItems {
     img: string;
@@ -52,7 +59,23 @@ export interface imageItems {
     author: string;
 }
 
-export function ExternalUserView() {
+function getModalStyle() {
+    const top = 50;
+    const left = 50;
+
+    return {
+        top: `${top}%`,
+        left: `${left}%`,
+        transform: `translate(-${top}%, -${left}%)`,
+    };
+}
+
+interface Props {
+    dates: number[]
+    setDates: Dispatch<SetStateAction<number[]>>
+}
+
+export function ExternalUserView(props: Props) {
     const classes = useStyles();
     let userDetails = JSON.parse(localStorage.getItem('user') as string);
     //<img src={itemData[0].img} alt='img' />
@@ -69,14 +92,20 @@ export function ExternalUserView() {
     const [isButtonOpen, setButtonOpen] = useState(false);
     const [isAddUserModeOpen, setAddUserModeOpen] = useState(false);
     const [eventName, setEventName] = useState("");
+    const [eventDate, setEventDate] = useState("");
     const [imageUrl, setImageUrl] = useState('');
     const [allimagesUrl, setAllimagesUrl] = useState('');
     const [isImageOpen, setImageOpen] = useState(false);
     const [isEventsOpen, setEventsOpen] = useState(false);
     //const [itemData, setItemData] = useState<imageItems[]>([]);
-    const [isEventModelOpen, setEventModelOpen] = useState(false);
+    const [nonEnrolledUser, setNonEnrolledUser] = useState<UserModel>();
+    const [isWarningOpen, setWarningOpen] = useState(false);
+    //const [enrollDates, setEnrollDates] = useState<number[]>([]);
+    const [sendEmail, setSendEmail] = useState<string>("");
+
 
     const eventApi = new EventApi();
+    const [modalStyle] = React.useState(getModalStyle);
 
     var QRCode = require('qrcode');
     var firstTime = 0;
@@ -88,7 +117,7 @@ export function ExternalUserView() {
         try {
             const qrResponse = await QRCode.toDataURL("Event Name: " + eventName
                 + "\n User Information: \n" + userModel.firstName + "\n"
-                + userModel.lastName + "\n" + userModel.tcKimlikNumber);
+                + userModel.lastName + "\n" + userModel.email + "\n" + userModel.tcKimlikNumber);
             setImageUrl(qrResponse);
             //await generateQrCodeForEvent(userModel.firstName, userModel.lastName, userModel.tcKimlikNumber, eventName);
             fetchEnrolledEvents();
@@ -191,6 +220,33 @@ export function ExternalUserView() {
         if (messageResponse.messageType === MessageType.SUCCESS) {
             toast.success(messageResponse.message);
             setAddEventModelOpen(false);
+            setImageOpen(true);
+            setNonEnrolledUser(userModel);
+
+            // Get day in month when enrolled
+            /*let currentDayInMonth = new Date().getDate();
+            let tempDates = props.dates;
+            let index = props.dates.length;
+            tempDates[index] = currentDayInMonth;
+            props.setDates(tempDates);*/
+
+            console.log(userModel.email);
+            setSendEmail(userModel.email);
+
+            send(
+                'service_htsn6ci',
+                'template_4iw9ol8',
+                { to_name: userModel.firstName,
+                    event_name: userModel.enrolledEventName, qrcode: eventDate, email: userModel.email},
+                'user_RoXWoGpsUt4N83fNXtLVj'
+            )
+                .then((response) => {
+                    console.log('SUCCESS!', response.status, response.text);
+                })
+                .catch((err) => {
+                    console.log('FAILED...', err);
+                });
+
         } else {
             toast.error(messageResponse.message);
             setAddEventModelOpen(false);
@@ -212,43 +268,48 @@ export function ExternalUserView() {
             toast.error(messageResponse.message);
         }
     }
-    /*
-    {itemData.map((item) => (
-                        <ImageListItem key={item.img}>
-                            <img src={item.img} alt={item.title} />
-                            <ImageListItemBar
-                                title={item.title}
-                                subtitle={<span>by: {item.author}</span>}
-                            />
-                        </ImageListItem>
-                    ))}*/
 
-/*<div className={classes.root}>
-                <ImageList rowHeight={180} className={classes.imageList}>
-                    <ImageListItem key="Subheader" cols={2} style={{ height: 'auto' }}>
-                        <ListSubheader component="div">December</ListSubheader>
-                    </ImageListItem>
 
-                    {itemData.map((item) => (
-                        <ImageListItem key={item.img}>
-                            <img src={item.img} alt={item.title} />
-                            <ImageListItemBar
-                                title={item.title}
-                                subtitle={<span>by: {item.author}</span>}
-                            />
-                        </ImageListItem>
-                    ))}
-                </ImageList>
-            </div>*/
+    const imageBody = (
+        <div style={modalStyle} className={classes.paper}>
+            <h2 id="simple-modal-title">{eventName}</h2>
+            <img src={imageUrl} alt={"asd"}/>
+            <p id="simple-modal-description">
+                User First Name: {nonEnrolledUser?.firstName}
+                <br></br>
+                User Last Name: {nonEnrolledUser?.lastName}
+                <br></br>
+                User Email: {nonEnrolledUser?.email}
+                <br></br>
+                User TCKN: {nonEnrolledUser?.tcKimlikNumber}
+            </p>
+            <Button onClick={() => {
+                if(userDetails == null || nonEnrolledUser?.firstName != userDetails?.firstName)
+                    setWarningOpen(true);
+                else
+                    setImageOpen(false);
+            }}>Close</Button>
+        </div>
+    );
 
-    //<ShowImages itemData={itemData} setEventModelOpen={setEventModelOpen} isEventModelOpen={isEventModelOpen}/>
+    const warningBody = (
+        <div style={modalStyle} className={classes.paper}>
+            <h2 id="close-warning">Close Event Information?</h2>
+            <p id="warning-desc">
+                Since the user enrolled is not logged in, once this card is closed the event information
+                will only be available through the email sent. Are you sure you cant to close?
+            </p>
+            <Button onClick={() => {setImageOpen(false); setWarningOpen(false);}}>Yes</Button>
+            <Button onClick={() => setWarningOpen(false)}>No</Button>
+        </div>
+    )
 
     return (
         <div>
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
-                        Welcome to Event Management {userDetails.firstName}
+                        Welcome to Event Management {userDetails?.firstName}
                     </Typography>
                     <Button disabled={userDetails == null} color="inherit" href="/logout">Log Out</Button>
                     <Button color="inherit" href="/logoutExt">Login</Button>
@@ -257,13 +318,29 @@ export function ExternalUserView() {
             <AddEvent isOpen={isAddEventModelOpen}
                       handleClose={() => setAddEventModelOpen(false)}
                       addEvent={addEvent}/>
-            <EventList events={eventQueryResponse} setButtonOpen={setButtonOpen} setEventName={setEventName}/>
+            <EventList events={eventQueryResponse} setButtonOpen={setButtonOpen} setEventName={setEventName} setEventDate={setEventDate}/>
             <Button disabled={isButtonOpen == false} color="primary" variant="contained" onClick={() => setAddUserModeOpen(true)}>Enroll In Event</Button>
             <AddUserToEvent isOpen={isAddUserModeOpen} handleClose={() => setAddUserModeOpen(false)} addUserToEvent={addUserToEvent} eventName={eventName} generateQrCode={generateQrCode}/>
             <Grid container spacing={2}>
                 <Grid item>
                     <br/>
-                    {imageUrl ? (<img src={imageUrl} alt="img"/>) : null}
+                    <Modal
+                        open={isImageOpen}
+                        onClose={() => setImageOpen(false)}
+                        aria-labelledby="simple-modal-title"
+                        aria-describedby="simple-modal-description"
+                        disableBackdropClick={userDetails == null || nonEnrolledUser?.firstName != userDetails?.firstName}
+                    >
+                        {imageBody}
+                    </Modal>
+
+                    <Modal open={isWarningOpen}
+                           onClose={() => {
+                               setWarningOpen(false);
+                           }}
+                    >
+                        {warningBody}
+                    </Modal>
                 </Grid>
             </Grid>
             <Button disabled={userDetails == null} color="primary" onClick={() => { if(isEventsOpen == false){

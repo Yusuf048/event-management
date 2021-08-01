@@ -14,6 +14,7 @@ interface Props {
     events: EventQueryResponse[]
     setButtonOpen: Dispatch<SetStateAction<boolean>>
     setEventName: Dispatch<SetStateAction<string>>
+    setEventDate: Dispatch<SetStateAction<string>>
 }
 
 export function EventList(props: Props) {
@@ -22,9 +23,11 @@ export function EventList(props: Props) {
         <div style={{height: 400, width: '100%'}}>
             <DataGrid columns={tableColumns} rows={props.events} pageSize={5} disableMultipleSelection
             onRowSelected={(newSelection) => {
-                var eventName = newSelection.data.name;
+                let eventName = newSelection.data.name;
+                let startDate = newSelection.data.startDate;
                 console.log(eventName);
                 props.setEventName(eventName);
+                props.setEventDate(startDate);
                 props.setButtonOpen(true);
             }}/>
         </div>
