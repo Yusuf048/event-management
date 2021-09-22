@@ -69,7 +69,7 @@ export function UpdateEventForm(props: Props) {
         <Dialog
             open={props.isOpen}
             onClose={props.handleClose}>
-            <DialogTitle>Add Event</DialogTitle>
+            <DialogTitle>Update Event</DialogTitle>
             <DialogContent>
                 <TextField onChange={onUpdateFormChange} fullWidth name="name" label={props.initialEvent.name}/>
                 <TextField onChange={onUpdateFormChange} fullWidth name="startDate" label={props.initialEvent.startDate}/>
