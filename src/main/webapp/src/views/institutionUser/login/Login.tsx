@@ -151,7 +151,7 @@ const Login = () => {
 
         if(ExternalUserQueryResponse == undefined) {
             while(InstitutionUserQueryResponse[count] != null) {
-                if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
+                if (state.username == InstitutionUserQueryResponse[count]?.username && state.password == InstitutionUserQueryResponse[count]?.password) {
                     dispatch({
                         type: 'loginSuccess',
                         payload: 'Login Successful'
@@ -166,7 +166,7 @@ const Login = () => {
             }
         } else {
             while(InstitutionUserQueryResponse[count] != null || ExternalUserQueryResponse[count] != null) {
-                if (state.username === InstitutionUserQueryResponse[count].username && state.password === InstitutionUserQueryResponse[count].password) {
+                if (state.username == InstitutionUserQueryResponse[count]?.username && state.password == InstitutionUserQueryResponse[count]?.password) {
                     dispatch({
                         type: 'loginSuccess',
                         payload: 'Login Successful'
@@ -176,7 +176,7 @@ const Login = () => {
                     localStorage.setItem("user", JSON.stringify(InstitutionUserQueryResponse[count]))
                     console.log(InstitutionUserQueryResponse[count]);
                     break;
-                } else if (state.username === ExternalUserQueryResponse[count]?.email && state.password === ExternalUserQueryResponse[count]?.password) {
+                } else if (state.username == ExternalUserQueryResponse[count]?.email && state.password == ExternalUserQueryResponse[count]?.password) {
                     dispatch({
                         type: 'loginSuccess',
                         payload: 'Login Successful'
